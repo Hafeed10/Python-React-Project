@@ -21,8 +21,8 @@ const ShowProducts = () => {
       <h2>All Products</h2>
       <div className='middile'>
         {
-          products.map((product, index) => (
-            <div className='max' key={index}>
+          products.map((product) => (
+            <div className='max' key={product.id}>
               <img src={product.image} height='200' width='250' alt="" />
               <h3>{product.name}</h3>
               <p className='price'>${product.price}</p>

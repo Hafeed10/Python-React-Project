@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from 'react-router-dom';
-import axios from "axios";
-import './add.css'
+import axios from 'axios'; // Fixed import statement
+import './add.css';
 
 const AddProduct = () => {
   const [image, setImage] = useState(null);
@@ -9,31 +9,36 @@ const AddProduct = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-
+  const [quantity, setQuantity] = useState("");
   const history = useHistory();
 
-  const Addproduct = async () => {
-    // Create a new FormData object to store the form fields
-    let formField = new FormData();
+  const addProductInfo = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
 
-    // Append the form fields to the FormData object
+    let formField = new FormData();
     formField.append('name', name);
     formField.append('productPrice', productPrice);
     formField.append('description', description);
     formField.append('category', category);
-    
-    // Check if an image is selected and append it to the FormData object
     if (image !== null) {
       formField.append('image', image);
     }
+    if (quantity !== "") {
+      formField.append('quantity', quantity);
+    }
 
     try {
-      const response = await axios.get('http://localhost:8000/api/products/', formField);
-      
-      console.log(response.data);
-      history.push('/');
+      const response = await axios.post('http://localhost:8000/api/products/', formField);
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const responseData = await response.json();
+      console.log('Product added successfully:', responseData);
+      history.push('/'); // Redirect to homepage after successful submission
     } catch (error) {
-      console.error('Error adding product:', error);
+      console.error('Error adding product:', error.message);
     }
   };
 
@@ -42,13 +47,13 @@ const AddProduct = () => {
       <h2>Add Product</h2>
       <div className="container">
         <div className="form-group1">
-          <div className="from-contol">
+          <form className="from-control">
             <div className="from-group">
               <label htmlFor="">Select Image to Upload</label>
               <input
                 type="file"
                 className="from-control from-control-lg"
-                name="Image"
+                name="image"
                 onChange={(e) => setImage(e.target.files[0])}
               />
             </div>
@@ -57,7 +62,7 @@ const AddProduct = () => {
                 type="text"
                 className="from-control from-control-lg"
                 placeholder="Enter Product Name"
-                name="ProductName"
+                name="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -67,7 +72,7 @@ const AddProduct = () => {
                 type="text"
                 className="from-control from-control-lg"
                 placeholder="Enter Product Price"
-                name="Price"
+                name="productPrice"
                 value={productPrice}
                 onChange={(e) => setProductPrice(e.target.value)}
               />
@@ -77,7 +82,7 @@ const AddProduct = () => {
                 type="text"
                 className="from-control from-control-lg"
                 placeholder="Enter Product Description"
-                name="Description"
+                name="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -87,13 +92,23 @@ const AddProduct = () => {
                 type="text"
                 className="from-control from-control-lg"
                 placeholder="Enter Product Category"
-                name="Category"
+                name="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               />
             </div>
-            <button className="btn" onClick={Addproduct}>Add Product</button>
-          </div>
+            <div className="from-group">
+              <input
+                type="text"
+                className="from-control from-control-lg"
+                placeholder="Enter Product Quantity"
+                name="quantity"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+            </div>
+            <button type="submit" onClick={addProductInfo} className="btn">Add Product</button>
+          </form>
         </div>
       </div>
     </div>
